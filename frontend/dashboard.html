@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task List</title>
+    <link rel="stylesheet" href="styles/dashboard.css" />
+    <!-- Font Awesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=delete" />
+  </head>
+  <body>
+    <div id="app" class="main-app">
+      <!-- Sidebar -->
+      <div class="sidebar expanded">
+        <div class="logoContainer">
+          <div class="imgContainer">
+            <img
+              src="styles/images/22Capture.PNG"
+              alt="Remote Logo"
+              class="logo" />
+          </div>
+          <div class="logoName">
+            <h4>Task List</h4>
+          </div>
+        </div>
+
+        <div id="tabs" class="tabs">
+          <div class="sidebar-item">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Task</span>
+          </div>
+
+          <div
+            class="sidebar-item active tablink"
+            id="defaultOpen"
+            onclick="openlink(event,'inbox')">
+            <i class="fa-solid fa-inbox"></i>
+            <span>Inbox</span>
+          </div>
+
+          <div
+            class="sidebar-item tablink"
+            onclick="openlink(event,'completed')">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Completed</span>
+          </div>
+        </div>
+
+        <!-- New Profile Section -->
+        <div class="profile-section">
+          <div class="profile-header">
+            <div class="avatar">
+              <img
+                src="https://randomuser.me/api/portraits/med/men/75.jpg"
+                alt="Jane Doe" />
+            </div>
+            <div class="user-info">
+              <div class="user-name">Jane Doe</div>
+              <div class="user-title">Free User</div>
+            </div>
+            <div class="menu-button">
+              <div class="dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="main-content">
+        <div class="inboxContent tabContent" id="inbox">
+          <div class="header">
+            <h1>Hello, Jane Doe <span class="emoji">👋</span></h1>
+            <p>I see you're quite busy today</p>
+          </div>
+
+          <!-- Inbox Task Tabs -->
+          <div class="container">
+            <h1 class="inbox-title">Inbox</h1>
+            <div v-if="tasks.length > 0">
+              <ul class="task-list">
+                <template v-for="(task, index) in tasks" :key="index">
+                  <li class="task-item">
+                    <div style="display: flex">
+                      <div
+                        class="task-checkbox"
+                        @click="checkTask(task.id)"></div>
+                      <div class="task-text" @click="toggleAccordion(index)">
+                        {{ task.title }}
+                      </div>
+                    </div>
+                    <div class="task-delete" @click="deleteTask(task.id)">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        height="20px"
+                        viewBox="0 -960 960 960"
+                        width="20px"
+                        fill="#000000">
+                        <path
+                          d="M312-144q-29.7 0-50.85-21.15Q240-186.3 240-216v-480h-48v-72h192v-48h192v48h192v72h-48v479.57Q720-186 698.85-165T648-144H312Zm336-552H312v480h336v-480ZM384-288h72v-336h-72v336Zm120 0h72v-336h-72v336ZM312-696v480-480Z" />
+                      </svg>
+                    </div>
+                  </li>
+                  <transition name="slide">
+                    <div
+                      class="accordion-content"
+                      v-show="activeAccordionIndex === index">
+                      <p><strong>Description:</strong> {{ task.description}}</p>
+                      <p><strong>Due:</strong> {{ task.due_date}}</p>
+                    </div>
+                  </transition>
+                </template>
+              </ul>
+            </div>
+
+            <div
+              class="empty-content"
+              style="
+                position: absolute;
+                top: 50%;
+                left: 60%;
+                transform: translate(-50%, -50%);
+              "
+              v-else>
+              <i class="fas fa-clipboard-list"></i>
+              <p>No Task Available</p>
+            </div>
+
+            <div class="add-task">
+              <div class="add-icon"><i class="fa-solid fa-plus"></i></div>
+              <div class="add-text">Add task</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Completed Task Tabs -->
+        <div class="completedContent tabContent" id="completed">
+          <div class="header" v-if="completedTasks.length > 0">
+            <h1>Great job, Jane Doe <span class="emoji">🎉</span></h1>
+            <p>Youve completed all your tasks.🥳</p>
+          </div>
+          <div class="header" v-else>
+            <h1>Aww Jane Doe <span class="emoji">😔</span></h1>
+            <p>No completed tasks found.😥😥..</p>
+          </div>
+
+          <div class="container">
+            <h1 class="inbox-title">Completed Tasks</h1>
+            <div v-if="completedTasks.length > 0">
+              <ul class="task-list">
+                <template v-for="(task, index) in completedTasks" :key="index">
+                  <li class="task-item">
+                    <div style="display: flex">
+                      <div class="task-checked" @click="checkTask(task.id)">
+                        <i class="fa-solid fa-check"></i>
+                      </div>
+                      <div class="task-text" @click="toggleAccordion(index)">
+                        {{ task.title }}
+                      </div>
+                    </div>
+                    <div class="task-delete" @click="deleteTask(task.id)">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        height="20px"
+                        viewBox="0 -960 960 960"
+                        width="20px"
+                        fill="#000000">
+                        <path
+                          d="M312-144q-29.7 0-50.85-21.15Q240-186.3 240-216v-480h-48v-72h192v-48h192v48h192v72h-48v479.57Q720-186 698.85-165T648-144H312Zm336-552H312v480h336v-480ZM384-288h72v-336h-72v336Zm120 0h72v-336h-72v336ZM312-696v480-480Z" />
+                      </svg>
+                    </div>
+                  </li>
+
+                  <transition name="slide">
+                    <div
+                      class="accordion-content"
+                      v-show="activeAccordionIndex === index">
+                      <p><strong>Description:</strong> {{ task.description}}</p>
+                      <p><strong>Due:</strong> {{ task.due_date}}</p>
+                    </div>
+                  </transition>
+                </template>
+              </ul>
+            </div>
+
+            <div
+              class="empty-content"
+              style="
+                position: absolute;
+                top: 50%;
+                left: 60%;
+                transform: translate(-50%, -50%);
+              "
+              v-else>
+              <i class="fas fa-clipboard-list"></i>
+              <p>No Completed Tasks</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enhanced Dialog Container -->
+      <div
+        class="dialog-container"
+        id="taskDialog"
+        style="
+          display: none;
+          position: fixed;
+          top: 25%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 1000;
+          width: 200rem;
+        ">
+        <div class="dialog-content">
+          <input
+            type="text"
+            class="task-input"
+            v-model="title"
+            required
+            placeholder="Clean out fridge Saturday evening..." />
+          <div class="description-label">
+            <input
+              type="text"
+              v-model="description"
+              placeholder="Description"
+              class="task-input description" />
+          </div>
+        </div>
+
+        <div class="options-bar">
+          <input
+            type="date"
+            ref="flatpickrInput"
+            name="date-input"
+            v-model="due_date"
+            id="date-input" />
+        </div>
+
+        <div class="dialog-footer">
+          <div class="inbox-selector">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M22 12h-6l-2 3h-4l-2-3H2"></path>
+              <path
+                d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+            </svg>
+            What are we doing today?
+            <svg
+              class="dropdown-icon"
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+
+          <div class="dialog-actions">
+            <button class="cancel-button" id="cancelTask">Cancel</button>
+            <button
+              class="add-task-button"
+              @click="addTask"
+              id="confirmAddTask">
+              Add task
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overlay for dialog background -->
+      <div
+        id="overlay"
+        style="
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.5);
+          z-index: 999;
+        "></div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
